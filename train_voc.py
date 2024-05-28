@@ -76,8 +76,8 @@ class Data:
                             transforms.ToTensor(),
                             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
                         ]))
-        self.trainLoader = torch.utils.data.DataLoader(train_dataset, batch_size=256, shuffle=True, num_workers=4)
-        self.testLoader = torch.utils.data.DataLoader(test_dataset, batch_size=256, shuffle=False, num_workers=4)
+        self.trainLoader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4)
+        self.testLoader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=4)
 
 def main():
     args = parse_args()
