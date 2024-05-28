@@ -251,10 +251,10 @@ def main():
 
     show_gradients(model)
 
-    if args.source_net:
-        last_ckpt = checkpoint["state_dict"]
-    else:
-        last_ckpt = copy.deepcopy(model.state_dict())
+    # if args.source_net:
+    #     last_ckpt = checkpoint["state_dict"]
+    # else:
+    last_ckpt = copy.deepcopy(model.state_dict())
 
     # Start training
     for epoch in range(args.start_epoch, args.epochs + args.warmup_epochs):
