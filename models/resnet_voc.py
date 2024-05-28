@@ -13,6 +13,7 @@ from torchvision.models._utils import _ovewrite_named_param
 # from utils.conv_type import PretrainConv
 # PretrainConv = nn.Conv2d
 from torch.distributions.normal import Normal
+from layers import SubnetConv, SubnetLinear
 
 # from load_model import PretrainConv
 PretrainConv = nn.Conv2d
@@ -148,6 +149,12 @@ def kseconv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1
 def kseconv1x1(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     return Conv2d_KSE(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
+def hydraconv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
+    return SubnetConv(in_planes, out_planes, kernel_size=3, stride=stride, bias=False)
+
+def hydraconv1x1(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
+    return SubnetConv(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+
 
 class BasicBlock(nn.Module):
     expansion: int = 1
@@ -165,6 +172,7 @@ class BasicBlock(nn.Module):
         lottery: bool = False,
         kse: bool = False,
         mask: bool = False,
+        hydra: bool = False,
     ) -> None:
         super().__init__()
         if norm_layer is None:
@@ -179,6 +187,9 @@ class BasicBlock(nn.Module):
         elif kse:
             self.conv3x3 = kseconv3x3
             self.conv1x1 = kseconv1x1
+        elif hydra:
+            self.conv3x3 = hydraconv3x3
+            self.conv1x1 = hydraconv1x1
         else: 
             self.conv3x3 = conv3x3
             self.conv1x1 = conv1x1
@@ -235,6 +246,7 @@ class Bottleneck(nn.Module):
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         lottery: bool = False,
         kse: bool = False,
+        hydra: bool = False,
     ) -> None:
         super().__init__()
         if norm_layer is None:
@@ -247,6 +259,9 @@ class Bottleneck(nn.Module):
         elif kse:
             self.conv3x3 = kseconv3x3
             self.conv1x1 = kseconv1x1
+        elif hydra:
+            self.conv3x3 = hydraconv3x3
+            self.conv1x1 = hydraconv1x1
         else: 
             self.conv3x3 = conv3x3
             self.conv1x1 = conv1x1
@@ -297,6 +312,7 @@ class ResNet(nn.Module):
         kse: bool = False,
         mask: bool = False,
         attribute_preserve: bool = False,
+        hydra: bool = False,
     ) -> None:
         super().__init__()
         # _log_api_usage_once(self)
@@ -319,6 +335,7 @@ class ResNet(nn.Module):
         self.kse = kse
         self.mask = mask
         self.attribute_preserve = attribute_preserve
+        self.hydra = hydra
         self.groups = groups
         self.base_width = width_per_group
         if lottery:
@@ -384,7 +401,7 @@ class ResNet(nn.Module):
         layers = []
         layers.append(
             block(
-                self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer, lottery=self.lottery, mask=self.mask, kse=self.kse
+                self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer, lottery=self.lottery, mask=self.mask, kse=self.kse, hydra=self.hydra
             )
         )
         self.inplanes = planes * block.expansion
@@ -400,6 +417,7 @@ class ResNet(nn.Module):
                     lottery=self.lottery,
                     mask=self.mask,
                     kse=self.kse,
+                    hydra=self.hydra,
                 )
             )
 

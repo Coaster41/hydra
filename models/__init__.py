@@ -32,6 +32,7 @@ from models.basic import (
 
 from models.resnet import ResNet18, ResNet34, ResNet50
 from models.resnet_voc import resnet34
+from models.layers import SubnetLinear, SubnetConv
 
 __all__ = [
     "vgg2",

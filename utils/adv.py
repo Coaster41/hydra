@@ -32,7 +32,7 @@ def trades_loss(
     natural_criterion=nn.CrossEntropyLoss(),
 ):
     # define KL-loss
-    criterion_kl = nn.KLDivLoss(size_average=False)
+    criterion_kl = nn.KLDivLoss(reduction='sum')
     model.eval()
     batch_size = len(x_natural)
     # generate adversarial example
@@ -117,7 +117,7 @@ def trades_loss_hot_vector(
     distance="l_inf",
 ):
     # define KL-loss
-    criterion_kl = nn.KLDivLoss(size_average=False)
+    criterion_kl = nn.KLDivLoss(reduction='sum')
     model.eval()
     batch_size = len(x_natural)
     # generate adversarial example

@@ -68,7 +68,7 @@ def train(
         else:
             output = model(images)
             loss_natural = nn.CrossEntropyLoss()(output, target)
-            loss_robust = (1.0 / len(images)) * nn.KLDivLoss(size_average=False)(
+            loss_robust = (1.0 / len(images)) * nn.KLDivLoss(reduction='sum')(
                 F.log_softmax(
                     model(
                         images + torch.randn_like(images).to(device) * args.noise_std

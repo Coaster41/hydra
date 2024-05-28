@@ -52,7 +52,7 @@ class VocModel(nn.Module):
         # Use a pretrained model
         self.network = models.resnet34(weights=weights, mask=mask, lottery=lottery, attribute_preserve=attribute_preserve)
         # Replace last layer
-        self.network.fc = nn.Linear(self.network.fc.in_features, num_classes)
+        self.network.fc = models.SubnetLinear(self.network.fc.in_features, num_classes)
 
     def forward(self, xb):
         return self.network(xb)
