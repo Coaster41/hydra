@@ -1,9 +1,9 @@
 # ->->->->-> Primary <-<-<-<-<-
-arch: "vgg16_bn"
+arch: "resnet34"
 exp_name: "temp"
 result_dir: "./trained_models"
-num_classes: 10
-exp_mode: "pretrain"
+num_classes: 20
+exp_mode: "prune"
 layer_type: "subnet"
 init_type: "kaiming_normal"
 
@@ -29,9 +29,9 @@ val_method: base
 
 
 # ->->->->-> Dataset <-<-<-<-<-
-dataset: CIFAR10
-batch_size: 128
-test_batch_size: 128
+dataset: VOC
+batch_size: 256
+test_batch_size: 256
 data_dir: "./datasets"
 data_fraction: 1.0
 
