@@ -5,7 +5,7 @@ import torch.nn as nn
 import torchvision
 
 from utils.logging import AverageMeter, ProgressMeter
-from utils.eval import accuracy
+from utils.eval import accuracy, compute_f1, compute_mAP
 from utils.adv import trades_loss
 
 # TODO: add adversarial accuracy.
@@ -19,11 +19,11 @@ def train(
     batch_time = AverageMeter("Time", ":6.3f")
     data_time = AverageMeter("Data", ":6.3f")
     losses = AverageMeter("Loss", ":.4f")
-    top1 = AverageMeter("Acc_1", ":6.2f")
-    top5 = AverageMeter("Acc_5", ":6.2f")
+    mAP = AverageMeter("mAP", ":6.2f")
+    f1 = AverageMeter("f1_score", ":6.2f")
     progress = ProgressMeter(
         len(train_loader),
-        [batch_time, data_time, losses, top1, top5],
+        [batch_time, data_time, losses, mAP, f1],
         prefix="Epoch: [{}]".format(epoch),
     )
 
@@ -70,10 +70,15 @@ def train(
         )
 
         # measure accuracy and record loss
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+
+        # acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        labels_cpu = target.cpu().detach().numpy()
+        outputs_cpu = output.cpu().detach().numpy()
+        mAP.update(compute_mAP(labels_cpu, outputs_cpu), images.size(0))
+        f1.update(compute_f1(labels_cpu, outputs_cpu), images.size(0))
         losses.update(loss.item(), images.size(0))
-        top1.update(acc1[0], images.size(0))
-        top5.update(acc5[0], images.size(0))
+        # mAP.update(acc1[0], images.size(0))
+        # f1.update(acc5[0], images.size(0))
 
         optimizer.zero_grad()
         loss.backward()
