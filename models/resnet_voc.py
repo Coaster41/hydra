@@ -150,11 +150,23 @@ def kseconv1x1(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1
     return Conv2d_KSE(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 def hydraconv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
-    return SubnetConv(in_planes, out_planes, kernel_size=3, stride=stride, bias=False)
+    return SubnetConv(in_planes, out_planes, kernel_size=3, stride=stride, bias=False, groups=groups, dilation=dilation, padding=dilation)
 
 def hydraconv1x1(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
-    return SubnetConv(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+    return SubnetConv(in_planes, out_planes, kernel_size=1, stride=stride, bias=False, groups=groups, dilation=dilation, padding=dilation)
 
+def hydraconv7x7(in_planes: int, out_planes: int, stride: int = 2, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
+    """7x7 convolution with padding"""
+    return SubnetConv(
+        in_planes,
+        out_planes,
+        kernel_size=7,
+        stride=stride,
+        padding=3,
+        groups=groups,
+        bias=False,
+        dilation=dilation,
+    )
 
 class BasicBlock(nn.Module):
     expansion: int = 1
@@ -346,6 +358,10 @@ class ResNet(nn.Module):
             self.conv3x3 = kseconv3x3
             self.conv1x1 = kseconv1x1
             self.conv7x7 = conv7x7
+        elif hydra:
+            self.conv3x3 = hydraconv3x3
+            self.conv1x1 = hydraconv1x1
+            self.conv7x7 = hydraconv7x7
         else: 
             self.conv3x3 = conv3x3
             self.conv1x1 = conv1x1

@@ -48,10 +48,10 @@ from utils.model import (
 
 
 class VocModel(nn.Module):
-    def __init__(self, num_classes, weights=None, mask=False, lottery=False, attribute_preserve=False):
+    def __init__(self, num_classes, weights=None, mask=False, lottery=False, attribute_preserve=False, hydra=True):
         super().__init__()
         # Use a pretrained model
-        self.network = resnet_voc.resnet34(weights=weights, mask=mask, lottery=lottery, attribute_preserve=attribute_preserve)
+        self.network = resnet_voc.resnet34(weights=weights, mask=mask, lottery=lottery, attribute_preserve=attribute_preserve, hydra=hydra)
         # Replace last layer
         self.network.fc = layers.SubnetLinear(self.network.fc.in_features, num_classes)
 
