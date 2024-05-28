@@ -167,13 +167,13 @@ def adv(model, device, val_loader, criterion, args, writer, epoch=0):
     batch_time = AverageMeter("Time", ":6.3f")
     losses = AverageMeter("Loss", ":.4f")
     adv_losses = AverageMeter("Adv_Loss", ":.4f")
-    top1 = AverageMeter("Acc_1", ":6.2f")
-    top5 = AverageMeter("Acc_5", ":6.2f")
-    adv_top1 = AverageMeter("Adv-Acc_1", ":6.2f")
-    adv_top5 = AverageMeter("Adv-Acc_5", ":6.2f")
+    mAP = AverageMeter("Acc_1", ":6.2f")
+    f1 = AverageMeter("f1", ":6.2f")
+    adv_mAP = AverageMeter("Adv-Acc_1", ":6.2f")
+    adv_f1 = AverageMeter("Adv-f1", ":6.2f")
     progress = ProgressMeter(
         len(val_loader),
-        [batch_time, losses, adv_losses, top1, top5, adv_top1, adv_top5],
+        [batch_time, losses, adv_losses, mAP, f1, adv_mAP, adv_f1],
         prefix="Test: ",
     )
 
@@ -189,10 +189,14 @@ def adv(model, device, val_loader, criterion, args, writer, epoch=0):
             output = model(images)
             loss = criterion(output, target)
 
-            acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            # acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            labels_cpu = target.cpu().detach().numpy()
+            outputs_cpu = output.cpu().detach().numpy()
+            mAP.update(compute_mAP(labels_cpu, outputs_cpu), images.size(0))
+            f1.update(compute_f1(labels_cpu, outputs_cpu), images.size(0))
             losses.update(loss.item(), images.size(0))
-            top1.update(acc1[0], images.size(0))
-            top5.update(acc5[0], images.size(0))
+            # mAP.update(acc1[0], images.size(0))
+            # f1.update(acc5[0], images.size(0))
 
             # adversarial images
             images = pgd_whitebox(
@@ -213,10 +217,15 @@ def adv(model, device, val_loader, criterion, args, writer, epoch=0):
             loss = criterion(output, target)
 
             # measure accuracy and record loss
-            acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            # labels_cpu = target.cpu().detach().numpy()
+            outputs_cpu = output.cpu().detach().numpy()
+            adv_mAP.update(compute_mAP(labels_cpu, outputs_cpu), images.size(0))
+            adv_f1.update(compute_f1(labels_cpu, outputs_cpu), images.size(0))
             adv_losses.update(loss.item(), images.size(0))
-            adv_top1.update(acc1[0], images.size(0))
-            adv_top5.update(acc5[0], images.size(0))
+            # acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            # adv_losses.update(loss.item(), images.size(0))
+            # adv_mAP.update(acc1[0], images.size(0))
+            # adv_f1.update(acc5[0], images.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
@@ -238,7 +247,7 @@ def adv(model, device, val_loader, criterion, args, writer, epoch=0):
                 )
         progress.display(i)  # print final results
 
-    return adv_top1.avg, adv_top5.avg
+    return adv_mAP.avg, adv_f1.avg
 
 
 def mixtrain(model, device, val_loader, criterion, args, writer, epoch=0):
