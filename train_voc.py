@@ -141,7 +141,7 @@ def main():
 
     # Create model
     model = VocModel(num_classes=20).to(device)
-    model.load_state_dict(torch.load('resnet34_pretrained.pt'),c)
+    model.load_state_dict(torch.load('resnet34_pretrained.pt'), strict=False)
     if args.exp_mode != 'prune':
         checkpoint = torch.load(args.source_net, map_location=device)
         model.load_state_dict(checkpoint["state_dict"],strict=False)
