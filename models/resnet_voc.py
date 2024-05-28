@@ -13,7 +13,7 @@ from torchvision.models._utils import _ovewrite_named_param
 # from utils.conv_type import PretrainConv
 # PretrainConv = nn.Conv2d
 from torch.distributions.normal import Normal
-from models import SubnetConv, SubnetLinear
+from models.layers import SubnetConv, SubnetLinear
 
 # from load_model import PretrainConv
 PretrainConv = nn.Conv2d

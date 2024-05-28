@@ -50,9 +50,9 @@ class VocModel(nn.Module):
     def __init__(self, num_classes, weights=None, mask=False, lottery=False, attribute_preserve=False):
         super().__init__()
         # Use a pretrained model
-        self.network = models.resnet34(weights=weights, mask=mask, lottery=lottery, attribute_preserve=attribute_preserve)
+        self.network = models.resnet_voc.resnet34(weights=weights, mask=mask, lottery=lottery, attribute_preserve=attribute_preserve)
         # Replace last layer
-        self.network.fc = models.SubnetLinear(self.network.fc.in_features, num_classes)
+        self.network.fc = models.layers.SubnetLinear(self.network.fc.in_features, num_classes)
 
     def forward(self, xb):
         return self.network(xb)
