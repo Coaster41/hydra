@@ -153,7 +153,7 @@ def hydraconv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int =
     return SubnetConv(in_planes, out_planes, kernel_size=3, stride=stride, bias=False, groups=groups, dilation=dilation, padding=dilation)
 
 def hydraconv1x1(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
-    return SubnetConv(in_planes, out_planes, kernel_size=1, stride=stride, bias=False, groups=groups, dilation=dilation, padding=dilation)
+    return SubnetConv(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 def hydraconv7x7(in_planes: int, out_planes: int, stride: int = 2, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """7x7 convolution with padding"""
